@@ -4,7 +4,7 @@ const Users =require('../models/Users')
 const {generarJWT}=require('../helpers/jwt');
 
 const {
-    getALL,
+    getALL, getByAttribute,
 } = require('../controllers/dynamo');
 
 const crearUsuario = async(req,res=response)=>{
@@ -89,7 +89,8 @@ const revalidarToken = async(req,res=response)=>{
 
 const characters = async(req,res=response)=>{
     try {
-        const characters = await getALL('hpCharacters');
+        //const characters = await getALL('hpCharacters');
+        const characters = await getByAttribute('hpCharacters',{"name":"Apollyon Pringle"});
         res.status(200).json({
             status:true,
             characters

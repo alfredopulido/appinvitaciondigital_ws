@@ -29,20 +29,26 @@ const getById = async (table,id) => {
 const getByAttribute = async (table,params) => {
     let q='';
     let v={};
+    let n={};
     for (let key in params){
         const i=Object.keys(params).indexOf(key);
-        q+=((i>0)?' and ':'')+`${key} = :value${i}`;
+        q+=((i>0)?' and ':'')+`#${key} = :value${i}`;
         v={
             ...v,
             [":value"+i]:params[key]
         }
+        n={
+            ...n,
+            ["#"+key]:key
+        }
     }
     const query = {
         TableName: table,
-        KeyConditionExpression: q,
-        ExpressionAttributeValues:v
+        FilterExpression: q,
+        ExpressionAttributeValues:v,
+        ExpressionAttributeNames:n
     };
-    return await dynamoClient.get(query).promise();
+    return await dynamoClient.scan(query).promise();
 };
 
 const addOrUpdate = async (table,item) => {
