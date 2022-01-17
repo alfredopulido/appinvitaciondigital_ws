@@ -47,9 +47,8 @@ const crearUsuario = async(req,res=response)=>{
 }
 const loginUsuario = async(req,res=response)=>{
     const {email,password}= req.body
-    
     try {
-        const usuario=await Users.findOne({email});
+        const usuario = await findOne('Users',{email});
         if(!usuario){
             return res.status(400).json({
                 status:false,
@@ -71,10 +70,10 @@ const loginUsuario = async(req,res=response)=>{
             name:usuario.name,
             token
         })
-    } catch (error) {
+    } catch (error) { console.log(error)
         res.status(500).json({
             status:false,
-            message:"My name is Por favor hable con el adminisrtador [ " + JSON.stringify(error)
+            message:"Por favor hable con el adminisrtador [ " + JSON.stringify(error)
         })
     }
 }

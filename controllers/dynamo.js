@@ -73,70 +73,28 @@ const addOrUpdate = async (table,item) => {
 
 const insertNew = async (table,item) => {
     try {
-        /*var params = {
-            TableName : "Movies",
-            KeySchema: [       
-                { AttributeName: "id", KeyType: "HASH"},  //Partition key
-                { AttributeName: "title", KeyType: "RANGE" }  //Sort key
-            ],
-            AttributeDefinitions: [       
-                { AttributeName: "id", AttributeType: "S" },
-                { AttributeName: "title", AttributeType: "S" }
-            ],
-            ProvisionedThroughput: {       
-                ReadCapacityUnits: 10, 
-                WriteCapacityUnits: 10
+        const unique =uuidv4();
+        const params = {
+            TableName: table,
+            Item: {
+                "id": unique,
+                ...item
             }
         };
-        
-        dynamodb.createTable(params, function(err, data) {
-            if (err) {
-                console.error("Unable to create table. Error JSON:", JSON.stringify(err, null, 2));
-            } else {
-                console.log("Created table. Table description JSON:", JSON.stringify(data, null, 2));
-            }
-        });
-        */
-        var table = "Movies";
 
-        var year = 'GVQL9E8UVHUQAV0PBKKA4LQ09NVV4KQNSO5AEMVJF66Q9ASUAAJG';
-        var title = "The Big New Movie";
-
-        var params = {
-            TableName:table,
-            Item:{
-                "id": year,
-                "title": title,
-                "info":{
-                    "plot": "Nothing happens at all.",
-                    "rating": 0
+        return new Promise((resolve,reject)=>{
+            dynamoClient.put(params, function(err, data) {
+                if (err) {
+                    console.error("Unable to add item. Error JSON:", JSON.stringify(err, null, 2));
+                    reject(false);
+                } else {
+                    resolve(params.Item);
                 }
-            }
-        };
-
-        console.log("Adding a new item...");
-        dynamoClient.put(params, function(err, data) {
-            if (err) {
-                console.error("Unable to add item. Error JSON:", JSON.stringify(err, null, 2));
-            } else {
-                console.log("Added item:", JSON.stringify(data, null, 2));
-            }
+            })
         });
     } catch (error) {
         console.log(error)
     }
-
-    /*
-    const unique =uuidv4();
-    const params = {
-        TableName: table,
-        Item: {
-            "id": unique,
-            ...item
-        },
-    };
-    return await addOrUpdate(table,params);
-    */
 };
 
 const deleteById = async (table,id) => {
@@ -148,6 +106,32 @@ const deleteById = async (table,id) => {
     };
     return await dynamoClient.delete(params).promise();
 };
+
+const createTable = async (table) => {
+    const params = {
+        TableName : table,
+        KeySchema: [       
+            { AttributeName: "id", KeyType: "HASH"},  //Partition key
+            { AttributeName: "title", KeyType: "RANGE" }  //Sort key
+        ],
+        AttributeDefinitions: [       
+            { AttributeName: "id", AttributeType: "S" },
+            { AttributeName: "title", AttributeType: "S" }
+        ],
+        ProvisionedThroughput: {       
+            ReadCapacityUnits: 10, 
+            WriteCapacityUnits: 10
+        }
+    };
+    
+    dynamodb.createTable(params, function(err, data) {
+        if (err) {
+            console.error("Unable to create table. Error JSON:", JSON.stringify(err, null, 2));
+        } else {
+            console.log("Created table. Table description JSON:", JSON.stringify(data, null, 2));
+        }
+    });
+}
 
 module.exports = {
     dynamoClient,
