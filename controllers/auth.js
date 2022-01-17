@@ -4,28 +4,31 @@ const Users =require('../models/Users')
 const {generarJWT}=require('../helpers/jwt');
 
 const {
-    getALL, getByAttribute,
+    getByAttribute,findOne,insertNew
 } = require('../controllers/dynamo');
 
 const crearUsuario = async(req,res=response)=>{
     const {name,email,password}= req.body
 
     try {
-        let existe=await Users.findOne({email});
+        const existe = await findOne('Users',{email});
         if(existe){
             return res.status(400).json({
                 status:false,
-                message:"Un usuario existe con ese correo"
+                message:"Un usuario existe con ese correo",
+                code:1
             })
         }
 
-        const usuario = new Users(req.body);
-
         //Encriptar contraseña
         const salt=bcrypt.genSaltSync();
-        usuario.password=bcrypt.hashSync(password,salt)
-    
-        await usuario.save();
+        
+        const newuser = {
+            name,
+            email,
+            password:bcrypt.hashSync(password,salt)
+        }
+        const usuario = await insertNew('Users',newuser);
 
         const token=await generarJWT(usuario.id,usuario.name);
     
@@ -38,7 +41,7 @@ const crearUsuario = async(req,res=response)=>{
     } catch (error) {
         res.status(500).json({
             status:false,
-            message:"Error"
+            message:error
         })
     }
 }
