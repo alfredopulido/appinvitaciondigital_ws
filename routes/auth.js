@@ -5,7 +5,7 @@ Rutas de usuario
 const {Router}=require('express');
 const {check}=require('express-validator')
 const router =Router();
-const {crearUsuario,loginUsuario,revalidarToken,characters} = require('../controllers/auth');
+const {crearUsuario,loginUsuario,revalidarToken} = require('../controllers/auth');
 const { validarCampos } = require('../middlewares/validar-campos');
 const { validarJWT } = require('../middlewares/validar-jwt');
 
@@ -21,7 +21,5 @@ router.post('/',[
     validarCampos
 ],loginUsuario)
 router.get('/renew',validarJWT,revalidarToken);
-router.get('/characters',[
-],characters)
 
 module.exports=router

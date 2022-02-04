@@ -1,10 +1,9 @@
 const {response} = require('express')
 const bcrypt = require('bcryptjs')
-const Users =require('../models/Users')
 const {generarJWT}=require('../helpers/jwt');
 
 const {
-    getByAttribute,findOne,insertNew
+    findOne,insertNew
 } = require('../controllers/dynamo');
 
 const crearUsuario = async(req,res=response)=>{
@@ -78,7 +77,7 @@ const loginUsuario = async(req,res=response)=>{
     }
 }
 const revalidarToken = async(req,res=response)=>{
-    const {uid,name}= req
+    const {uid,name}= req;
     const token=await generarJWT(uid,name);
 
     res.status(201).json({
@@ -89,23 +88,8 @@ const revalidarToken = async(req,res=response)=>{
     })
 }
 
-const characters = async(req,res=response)=>{
-    try {
-        //const characters = await getALL('hpCharacters');
-        const characters = await getByAttribute('hpCharacters',{"name":"Apollyon Pringle"});
-        res.status(200).json({
-            status:true,
-            characters
-        })
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ err: 'Something went wrong' });
-    }
-}
-
 module.exports = {
     crearUsuario,
     loginUsuario,
-    revalidarToken,
-    characters
+    revalidarToken
 }
